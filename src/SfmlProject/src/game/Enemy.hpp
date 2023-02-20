@@ -92,6 +92,11 @@ public:
 		mesh.setScale(x, y);
 	}
 
+	void setSize(float x)
+	{
+		mesh.setScale(x, x);
+	}
+
 	sf::Vector2f getSize()
 	{
 		return sf::Vector2f(mesh.getScale());
@@ -116,6 +121,8 @@ public:
 		mesh.setPosition(x, y);
 	}
 
+	sf::CircleShape getMesh() const { return mesh; }
+
 	// --------------- Overlapping ------------//
 	
 	/**
@@ -125,19 +132,15 @@ public:
 	*/
 	bool isOverlapping(sf::Vector2i position)
 	{
-		if (
-			// Check x-axis
-			position.x >= mesh.getPosition().x && position.x <= mesh.getPosition().x + mesh.getGlobalBounds().width &&
-			// Check y-axis
-			position.y >= mesh.getPosition().y && position.y <= mesh.getPosition().y + mesh.getGlobalBounds().height
-			)
-		{
+		float r = mesh.getScale().x;
+		sf::Vector2f meshPos({ mesh.getPosition().x + r, mesh.getPosition().y + r });
+
+		float distance = std::sqrt(std::abs(std::pow(position.x - meshPos.x, 2) + std::pow(position.y - meshPos.y, 2)));
+
+		if (distance <= r)
 			return true;
-		}
 		else
-		{
 			return false;
-		}
 	}
 
 	//--------------- Time related ------------//

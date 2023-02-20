@@ -83,6 +83,8 @@ public:
 		scoreText.setString("NONE");
 		int width = scoreText.getGlobalBounds().width;
 		scoreText.setPosition(window->getSize().x / 2.f - width * 2, 20.f);
+
+		debug.log("Game initialized!");
 	}
 
 	/**
@@ -127,13 +129,13 @@ public:
 				{
 					// Random enemy size
 					float size = rng(10.f, 50.f);
-					e.setSize(size, size);
+					e.setSize(size);
 
 					// Random enemy position on screen
 					e.respawn(
 						{ 
-							rng(0, window->getSize().x - 25.f), 
-							rng(50, window->getSize().y - 25.f)
+							rng(0, window->getSize().x - e.getMesh().getGlobalBounds().width), 
+							rng(50, window->getSize().y - e.getMesh().getGlobalBounds().height)
 						}
 					);
 					e.setIsAlive(true);
@@ -165,6 +167,7 @@ public:
 
 		ss  << "Score: " << player->getPoints()
 			<< " | Accuracy: " << std::setw(5) << std::setprecision(4) << accuracy << "%"
+			<< " | Clicks: " << mouseClicks
 			<< std::endl;
 
 		scoreText.setString(ss.str());
@@ -178,8 +181,8 @@ public:
 	void initEnemies()
 	{
 		enemyMax = 1;
-		enemyMaxTimer = 0;
-		enemySpawnTimer = enemyMaxTimer;
+		enemyMaxTimer = 0.f;
+		enemySpawnTimer = 0.f;
 
 		for (int i = 0; i < enemyMax; i++)
 		{
@@ -224,6 +227,7 @@ public:
 			{
 				enemy.setIsAlive(false);
 				player->addPoints(1);
+				resetSpawnTimer();
 				break;
 			}
 		}
