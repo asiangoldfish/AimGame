@@ -116,6 +116,30 @@ public:
 		mesh.setPosition(x, y);
 	}
 
+	// --------------- Overlapping ------------//
+	
+	/**
+	 * @brief Checks whether a given position is overlapping the enemy
+	 * @param position Position to check against
+	 * @return True if overlapping, false if not
+	*/
+	bool isOverlapping(sf::Vector2i position)
+	{
+		if (
+			// Check x-axis
+			position.x >= mesh.getPosition().x && position.x <= mesh.getPosition().x + mesh.getGlobalBounds().width &&
+			// Check y-axis
+			position.y >= mesh.getPosition().y && position.y <= mesh.getPosition().y + mesh.getGlobalBounds().height
+			)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
 	//--------------- Time related ------------//
 	void setEnableTick(bool enableTick)
 	{
@@ -154,6 +178,7 @@ public:
 		*/
 
 
+
 		// Enemy circular motion
 		/*
 		float radius = 50.f;
@@ -168,7 +193,11 @@ public:
 		mesh.setPosition(x, y);
 		*/
 
-		target.draw(mesh);
+		// Render to screen only if alive
+		if (isAlive)
+		{
+			target.draw(mesh);
+		}
 	}
 
 	/**

@@ -2,15 +2,17 @@
 #include <string>
 #include <iostream>
 #include <vector>
-#include <windows.h>
-#include <sysinfoapi.h> // Time
+#include <sstream>
+#include <iomanip>
 
 // SFML
 #include <SFML/Graphics.hpp>
 
 // Custom
 #include "game/Enemy.hpp"
+#include "game/Player.hpp"
 #include "shared/math.hpp"
+#include "shared/debug.hpp"
 
 class Game
 {
@@ -24,8 +26,16 @@ private:
 	float enemyMaxTimer;		// Enemy max cooldown timer
 	float enemySpawnTimer;		// Current timer for spawning enemy
 
-	// System time
-	SYSTEMTIME st; // , lt;
+	// Player
+	Player *player;
+	int mouseClicks;
+
+	// Debugger
+	Debug debug;
+
+	// Fonts and texts
+	sf::Font opensans;
+	sf::Text scoreText;
 
 // Initializations
 public:
@@ -38,6 +48,9 @@ public:
 	Game() 
 	{
 		window = new sf::RenderWindow();
+
+		initEnemies();
+		debug = Debug();
 	}
 
 	/**
@@ -47,16 +60,29 @@ public:
 	*/
 	Game(sf::VideoMode videoMode, std::string title, int fps)
 	{
-		// Initialize system time for debugging
-		initSystime();
-
 		// Initialize main game window
 		window = new sf::RenderWindow();
 		window->create(videoMode, title);
 		window->setFramerateLimit(fps);
 
+		// Initialize player
+		player = new Player();
+
 		// Initialize enemies
 		initEnemies();
+		debug = Debug();
+
+		// Initialize fonts and texts
+		if (!opensans.loadFromFile("data/fonts/OpenSans-Regular.ttf"))
+		{
+			std::cerr << "ERROR: Could not load OpenSans font from file\n";
+		}
+
+		scoreText.setFont(opensans);
+		scoreText.setCharacterSize(20);
+		scoreText.setString("NONE");
+		int width = scoreText.getGlobalBounds().width;
+		scoreText.setPosition(window->getSize().x / 2.f - width * 2, 20.f);
 	}
 
 	/**
@@ -66,8 +92,13 @@ public:
 	*/
 	~Game()
 	{
+		// Window
 		delete window;
 		window = nullptr;
+
+		// Player
+		delete player;
+		player = nullptr;
 	}
 
 // Rendering
@@ -88,17 +119,24 @@ public:
 		// Only spawn new enemy if spawn timer is 0 and an enemy is dead
 		if (enemySpawnTimer <= 0)
 		{
-			/*
-			Revive the first dead enemy and spawn it in a random place on the
-			screen.
-			*/
+			//Revive the first dead enemy and spawn it in a random place on the
+			// screen.
 			for (auto &e : enemies)
 			{
 				if (!e.getIsAlive())
 				{
-					e.respawn({ rng() * window->getSize().x, rng() * window->getSize().y });
+					// Random enemy size
+					float size = rng(10.f, 50.f);
+					e.setSize(size, size);
+
+					// Random enemy position on screen
+					e.respawn(
+						{ 
+							rng(0, window->getSize().x - 25.f), 
+							rng(50, window->getSize().y - 25.f)
+						}
+					);
 					e.setIsAlive(true);
-					
 					resetSpawnTimer();
 					break;
 				}
@@ -116,7 +154,22 @@ public:
 			}
 		}
 
+		// Player score
+		std::stringstream ss;
+		
+		float accuracy;
+		if (mouseClicks == 0)
+			accuracy = 0.f;
+		else 
+			accuracy = player->getPoints() / static_cast<float>(mouseClicks) * 100.f;
 
+		ss  << "Score: " << player->getPoints()
+			<< " | Accuracy: " << std::setw(5) << std::setprecision(4) << accuracy << "%"
+			<< std::endl;
+
+		scoreText.setString(ss.str());
+		window->draw(scoreText);
+		
 		window->display();
 	}
 
@@ -124,8 +177,8 @@ public:
 public:
 	void initEnemies()
 	{
-		enemyMax = 10;
-		enemyMaxTimer = 1;
+		enemyMax = 1;
+		enemyMaxTimer = 0;
 		enemySpawnTimer = enemyMaxTimer;
 
 		for (int i = 0; i < enemyMax; i++)
@@ -142,7 +195,8 @@ public:
 
 	void updateSpawnTimer()
 	{
-		enemySpawnTimer -= 1 / 60.f;
+		if (enemySpawnTimer >= 0)
+			enemySpawnTimer -= 1 / 60.f;
 	}
 
 	void resetSpawnTimer()
@@ -150,28 +204,34 @@ public:
 		enemySpawnTimer = enemyMaxTimer;
 	}
 
+	/**
+	 * @brief Attempt to shoot the enemy
+	 * 
+	 * If the enemy was it, then kill it and remove from screen
+	 * 
+	 * @param aimedPos 
+	*/
+	void shootEnemy(sf::Vector2i aimedPos)
+	{
+		// Increase player mouse clicks to calculate their accuracy
+		mouseClicks++;
+
+		// TODO - Find a way to fetch the one enemy hit
+		for (auto &enemy : enemies)
+		{
+			// Kill enemy if aimed position overlaps it
+			if (enemy.isOverlapping(aimedPos))
+			{
+				enemy.setIsAlive(false);
+				player->addPoints(1);
+				break;
+			}
+		}
+	}
+
 public:
 	sf::RenderWindow* getWindow()
 	{
 		return window;
-	}
-
-// For debugging only
-private:
-	/**
-	 * @brief Initialize system time for debugging
-	*/
-	void initSystime()
-	{
-		GetSystemTime(&st);
-	}
-
-	void log(std::string msg)
-	{
-		// Time
-		std::cout << "[ " << st.wHour + 1 << ":" << st.wMinute << ":" << st.wSecond << " ] ";
-
-		// Message
-		std::cout << msg << std::endl;
 	}
 };

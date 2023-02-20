@@ -25,6 +25,7 @@
     <ClInclude Include="src\core\Engine.hpp" />
     <ClInclude Include="src\game\Enemy.hpp" />
     <ClInclude Include="src\game\Player.hpp" />
+    <ClInclude Include="src\shared\debug.hpp" />
     <ClInclude Include="src\shared\math.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -99,7 +100,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>${ProjectDir}src;$(ProjectDir)deps\SFML\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)src;$(ProjectDir)deps\SFML\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
