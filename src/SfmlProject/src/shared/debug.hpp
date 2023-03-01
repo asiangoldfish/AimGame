@@ -15,13 +15,19 @@ public:
 		initSystime();
 	}
 
+	/**
+	 * Log message to screen with timestamp
+	 * @param msg Message to log
+	*/
 	void log(std::string msg)
 	{
+#ifdef _DEBUG
 		// Time
-		std::cout << "[ " << st.wHour + 1 << ":" << st.wMinute << ":" << st.wSecond << " ] ";
+		std::cout << "[" << st.wHour + 1 << ":" << st.wMinute << ":" << st.wSecond << "] ";
 
 		// Message
 		std::cout << msg << std::endl;
+#endif // _DEBUG
 	}
 
 private:
