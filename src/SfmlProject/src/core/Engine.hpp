@@ -9,12 +9,13 @@
 #include <SFML/Graphics.hpp>
 
 // Custom
+#include "core/Button.hpp"
 #include "game/Enemy.hpp"
 #include "game/Player.hpp"
 #include "shared/math.hpp"
 #include "shared/debug.hpp"
 
-class Game
+class Engine
 {
 private:
 	// Window related data
@@ -45,7 +46,7 @@ public:
 	 * When using this constructor, the window must be created
 	 * manually.
 	*/
-	Game() 
+	Engine() 
 	{
 		window = new sf::RenderWindow();
 
@@ -58,7 +59,7 @@ public:
 	 * @param videoMode Screen size
 	 * @param title Window class name and displayed window title
 	*/
-	Game(sf::VideoMode videoMode, std::string title, int fps)
+	Engine(sf::VideoMode videoMode, std::string title, int fps)
 	{
 		// Initialize main game window
 		window = new sf::RenderWindow();
@@ -92,7 +93,7 @@ public:
 	* 
 	* Deallocates and releases memory
 	*/
-	~Game()
+	~Engine()
 	{
 		// Window
 		delete window;
@@ -135,6 +136,7 @@ public:
 					e.respawn(
 						{ 
 							rng(0, window->getSize().x - e.getMesh().getGlobalBounds().width), 
+							rng(0, window->getSize().x - e.getMesh().getGlobalBounds().width),
 							rng(50, window->getSize().y - e.getMesh().getGlobalBounds().height)
 						}
 					);
@@ -173,6 +175,14 @@ public:
 		scoreText.setString(ss.str());
 		window->draw(scoreText);
 		
+		/*
+		// Draw test button
+		Button button(opensans);
+		button.setSize({ 100.f, 100.f });
+		button.setPosition({ window->getSize().x / 2.f, window->getSize().y / 2.f });
+		button.draw(window);
+		*/
+
 		window->display();
 	}
 

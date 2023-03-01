@@ -13,8 +13,8 @@ int main()
     std::vector<void*> ptr;
 
     // Create window
-    Game *game = new Game(sf::VideoMode(800, 800), "Aim Game", 60);
-    sf::RenderWindow *window = game->getWindow();
+    Engine *engine = new Engine(sf::VideoMode(800, 800), "Aim Game", 60);
+    sf::RenderWindow *window = engine->getWindow();
 
     // Mouse
     sf::Vector2i mousePos;
@@ -22,7 +22,7 @@ int main()
     // Debugger
     Debug debug = Debug();
 
-    ptr.push_back(game);
+    ptr.push_back(engine);
     ptr.push_back(window);
 
     // Game loop
@@ -41,11 +41,11 @@ int main()
                     break;
 
                 case sf::Event::MouseButtonPressed:
-                    game->shootEnemy(mousePos);
+                    engine->shootEnemy(mousePos);
                     break;
             }
         }
-        game->draw();
+        engine->draw();
     }
 
     // Deallocate memory
