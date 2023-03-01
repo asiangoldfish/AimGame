@@ -24,6 +24,7 @@
   <ItemGroup>
     <ClInclude Include="src\core\Button.hpp" />
     <ClInclude Include="src\core\Engine.hpp" />
+    <ClInclude Include="src\core\Interface.hpp" />
     <ClInclude Include="src\core\Label.hpp" />
     <ClInclude Include="src\game\Enemy.hpp" />
     <ClInclude Include="src\game\Player.hpp" />
