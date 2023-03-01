@@ -132,15 +132,10 @@ public:
 	*/
 	bool isOverlapping(sf::Vector2i position)
 	{
-		float r = mesh.getScale().x;
-		sf::Vector2f meshPos({ mesh.getPosition().x + r, mesh.getPosition().y + r });
-
-		float distance = std::sqrt(std::abs(std::pow(position.x - meshPos.x, 2) + std::pow(position.y - meshPos.y, 2)));
-
-		if (distance <= r)
-			return true;
-		else
-			return false;
+		// Use the mesh's global bounds to check for overlapping
+		return mesh.getGlobalBounds().contains(
+			static_cast<float>(position.x), static_cast<float>(position.y)
+		);
 	}
 
 	//--------------- Time related ------------//
